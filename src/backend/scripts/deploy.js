@@ -53,7 +53,7 @@ const main = async () => {
 	const [ncontractId, ncontractAddress] = await contractDeployFcn(ncontractBytecode, gasLimit);
 	
 	console.log(` Marketplace Contract created with ID: ${contractId} / ${contractAddress}`);
-	console.log(` Marketplace Contract created with ID: ${ncontractId} / ${ncontractAddress}`);
+	console.log(` NFT Contract created with ID: ${ncontractId} / ${ncontractAddress}`);
 	
 };
 
