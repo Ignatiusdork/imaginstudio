@@ -46,7 +46,7 @@ contract Marketplace is ReentrancyGuard {
         feePercent = _feePercent;
     }
 
-    // Make item to offer on the marketplace
+    // Make or create an item to offer on the marketplace
 
     function makeItem(IERC721 _nft, uint _tokenId, uint _price) external nonReentrant {
         require(_price > 0, "Price must be greater than zero");
@@ -72,6 +72,8 @@ contract Marketplace is ReentrancyGuard {
             msg.sender
         );
     }
+
+    // Buy item from the market place
     function purchaseItem(uint _itemId) external payable nonReentrant {
         uint _totalPrice = getTotalPrice(_itemId);
         Item storage item = items[_itemId];
@@ -95,7 +97,7 @@ contract Marketplace is ReentrancyGuard {
             msg.sender
         );
     }
-
+    // Get the total price of the listed NFT
     function getTotalPrice(uint _itemId) view public returns(uint) {
         return(items[_itemId]).price*(100 + feePercent)/100;
     }

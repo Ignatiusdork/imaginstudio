@@ -17,3 +17,8 @@ contract NFT is ERC721URIStorage {
         return(tokenCount);
     }
 }
+
+// //function mint(address _to, uint256 _tokenId, string memory _uri) public {
+//   // Mint the NFT with the given parameters
+//   super._mint(_to, _tokenId, _uri);
+// }

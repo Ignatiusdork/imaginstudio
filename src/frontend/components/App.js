@@ -18,7 +18,12 @@ import MarketplaceAddress from "../contractsData/Marketplace-address.json";
 import NFTAbi from "../contractsData/NFT.json";
 import NFTAddress from "../contractsData/NFT-address.json";
 import  { Spinner }  from "reactstrap"
-import { WalletConnectProvider } from "@hashgraph/web3-provider";
+import { HashConnect } from "hashconnect";
+
+import { hethers } from '@hashgraph/hethers';
+
+
+let hashconnect = new HashConnect()
 
 function App() {
 
@@ -26,24 +31,41 @@ function App() {
   // pairing string for hashpack wallet connect
   
   const [loading, setLoading] = useState(true)
-  const [accountid, setAccountId] = useState(null)
+  const [accountId, setAccountId] = useState(null)
   const [nft, setNFT] = useState({})
   const [marketplace, setMarketplace] = useState({})
 
   //   hashpack wallet connect  
   const pairHashpack = async () => {
+    if ('request' in window) {
+      // access the properties of the request object here
+    } else {
+      // handle the error, for example by throwing an exception
+      throw new Error('request is undefined');
+    }
 
     // Query list of wallet addrs
-
+    const accountId = await window.hedera.request({method: 'hedera_requestAccounts'})
+    //const accountId = accountId || [];
+    
     // Set the wallet account to the 1st addrs
-    setAccountId(accountid[0])
+    setAccountId(accountId[0])
 
     // Get provider from wallet address eg haspack/MM
-    const provider = new WalletConnectProvider(window.ethereum);
+    const provider = new hethers.providers.Web3Provider(window.hedera)
 
     // Set signer
     const signer = provider.getSigner()
 
+    window.hedera.on('chainChanged', (chainId) => {
+      window.location.reload();
+    })
+
+    window.hedera.on('accountChanged', async function (accountId) {
+      setAccountId(accountId[0])
+      await pairHashpack()
+      
+    })
     // Load contract from the blockchain and sign
     loadContracts(signer)
   }
@@ -51,9 +73,9 @@ function App() {
   const loadContracts = async (signer) => {
     // Get deployed copies of contract
     
-    const marketplace = new ethers.Contract(MarketplaceAddress.address, MarketplaceAbi.abi, signer)
+    const marketplace = new hethers.Contract(MarketplaceAddress.address, MarketplaceAbi.abi, signer)
     setMarketplace(marketplace)
-    const nft = new ethers.Contract(NFTAddress.address, NFTAbi.abi, signer)
+    const nft = new hethers.Contract(NFTAddress.address, NFTAbi.abi, signer)
     setNFT(nft)
     setLoading(false)
   }
@@ -61,7 +83,7 @@ function App() {
   return (
     <BrowserRouter>
       <div className= "App">     
-        <Navigation pairHashpack={pairHashpack} accountid={accountid} />   
+        <Navigation pairHashpack={pairHashpack} accountId={accountId} />   
         {loading ? (
           <div style={{ display: 'flex', justifyContent: 'center', alignitems: 'center', minHeight: '80vh' }}>
             <Spinner animation="border" style={{ display: 'flex' }} />
@@ -71,8 +93,8 @@ function App() {
           <Routes>
             <Route path="/" element={<Home marketplace={marketplace} nft={nft}/>} />
             <Route path="/create" element={<Create marketplace={marketplace} nft={nft}/>} />
-            <Route path="/my-listed-items" element={<MyListedItems marketplace={marketplace} nft={nft} account={accountid}/> } />
-            <Route path="/my-purchases" element={<MyPurchases marketplace={marketplace} nft={nft} account={accountid}/>} />
+            <Route path="/my-listed-items" element={<MyListedItems marketplace={marketplace} nft={nft} account={accountId}/> } />
+            <Route path="/my-purchases" element={<MyPurchases marketplace={marketplace} nft={nft} account={accountId}/>} />
           </Routes>
         )}
 

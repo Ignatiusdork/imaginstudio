@@ -4,13 +4,14 @@ import {
 import { Navbar, Nav, Button, Container } from "react-bootstrap";
 import market from '../components/market.png';
 import React from 'react';
-import { pairHashpack } from '../hashconnect/index';
 import { useState } from 'react';
+//import { pairHashpack } from '../hashconnect/index';
 
-const [pairingString, setPairingString] = useState('')
 
-const Navigation = ({ accountid }) => {
-    
+const Navigation = ({ pairHashpack, accountId }) => {
+
+    const [pairingString, setPairingString] = useState('')
+
     return (
         <Navbar expand="lg" bg="secondary" variant="dark">
             <Container>
@@ -27,26 +28,28 @@ const Navigation = ({ accountid }) => {
                         <Nav.Link as={Link} to="/my-purchases">My Purchases</Nav.Link>
                     </Nav>
                     <Nav>
-                        {accountid ? (
+                        {accountId ? (
                             <Nav.Link
-                                id ='accountid'
+                                accountId={accountId}
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="button nav-button btn-sm mx-4">
                                 <Button variant="outline-light">
-                                    {
-                                        pairingString &&
-                                        <>
-                                            <h1>Pairing string</h1>
-                                            <p>{pairingString}</p>
-                                        </>
-                                    }
+                                    <p id='accountid'></p>
                                 </Button>
-
+                                {
+                                    pairingString &&
+                                    <>
+                                        <h1>Pairing string</h1>
+                                        <p>{pairingString}</p>
+                                    </>
+                                }
                             </Nav.Link>
                         ) : (
-                            <Button onClick={async() => {const saveData = await pairHashpack()
-                            setPairingString(saveData.pairingString)}} variant="outline-light">Connect Wallet</Button>
+                            <Button onClick={async () => {
+                                const saveData = await pairHashpack()
+                                setPairingString(saveData.pairingString)
+                            }} variant="outline-light">Connect Wallet</Button>
                         )}
                     </Nav>
                 </Navbar.Collapse>
